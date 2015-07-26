@@ -4,7 +4,7 @@ use std::env;
 use std::fmt;
 use std::result::Result;
 
-#[derive(Debug)]
+#[derive(Clone,Debug)]
 pub struct BinomialHeap {
     heads: VecDeque<Node>,
 }
@@ -37,7 +37,7 @@ impl fmt::Display for BinomialHeap {
     }
 }
 
-#[derive(Debug)]
+#[derive(Clone,Debug)]
 struct NodeData {
     rank: u16,
     value: i32,
@@ -193,6 +193,10 @@ impl BinomialHeap {
             }
         }
         return sz
+    }
+
+    pub fn merge(&mut self, mut other: BinomialHeap) {
+      self.heads = merge_nodes(&mut self.heads, &mut other.heads);
     }
 }
 
