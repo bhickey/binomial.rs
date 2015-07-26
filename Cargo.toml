@@ -2,3 +2,6 @@
 name = "binomial"
 version = "0.1.0"
 authors = ["Brendan Hickey <brendan@bhickey.net>"]
+
+[[bin]]
+name = "binomial_main"
