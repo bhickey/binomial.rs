@@ -193,4 +193,8 @@ impl BinomialHeap {
         }
         return sz
     }
+
+    pub fn merge(&mut self, mut other: BinomialHeap) {
+      self.heads = merge_nodes(&mut self.heads, &mut other.heads);
+    }
 }

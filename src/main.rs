@@ -1,6 +1,6 @@
 extern crate binomial;
-use binomial::BinomialHeap;
 
+use binomial::BinomialHeap;
 use std::env;
 
 fn main() {
@@ -11,7 +11,6 @@ fn main() {
             Some(i) => {
                 println!["pushing: {}", i];
                 heap.push(i);
-                println!["heap after: {}", heap];
                 println!["head: {:?}", heap.peek()];
             },
             None => println!["can't parse arg: {}", s],
