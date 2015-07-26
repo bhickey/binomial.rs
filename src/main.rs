@@ -1,40 +1,10 @@
 use std::cmp::Ordering;
 use std::collections::VecDeque;
 use std::env;
-use std::fmt;
-use std::result::Result;
 
 #[derive(Clone,Debug)]
 pub struct BinomialHeap {
     heads: VecDeque<Node>,
-}
-
-fn format_node_list(nodes: &VecDeque<Node>, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
-    try![write![f, "["]];
-    let mut i = nodes.iter();
-    if let Some(n) = i.next() {
-        try![write![f, "[{}", n.value]];
-        if !n.nodes.is_empty() {
-            try![write![f, " "]];
-            try![format_node_list(&n.nodes, f)];
-        }
-        try![write![f, "]"]];
-    }
-    for n in i {
-        try![write![f, ", [{}", n.value]];
-        if !n.nodes.is_empty() {
-            try![write![f, " "]];
-            try![format_node_list(&n.nodes, f)];
-        }
-        try![write![f, "]"]];
-    }
-    write![f, "]"]
-}
-
-impl fmt::Display for BinomialHeap {
-    fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
-        format_node_list(&self.heads, f)
-    }
 }
 
 #[derive(Clone,Debug)]
@@ -208,7 +178,6 @@ fn main() {
             Some(i) => {
                 println!["pushing: {}", i];
                 heap.push(i);
-                println!["heap after: {}", heap];
                 println!["head: {:?}", heap.peek()];
             },
             None => println!["can't parse arg: {}", s],
