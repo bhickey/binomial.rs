@@ -1,0 +1,4 @@
+[package]
+name = "binomial"
+version = "0.1.0"
+authors = ["Brendan Hickey <brendan@bhickey.net>"]
