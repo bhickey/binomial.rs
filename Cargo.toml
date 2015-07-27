@@ -1,7 +1,11 @@
 [package]
 name = "binomial"
 version = "0.1.0"
-authors = ["Brendan Hickey <brendan@bhickey.net>"]
+authors = ["Brendan Hickey <brendan@bhickey.net>",
+           "Donald S. Black <trurl@freeshell.org>"]
+
+[dependencies]
+rand = "0.3"
 
 [[bin]]
 name = "binomial_main"
