@@ -13,13 +13,19 @@ use std::mem;
 
 pub struct BinomialHeap<'a, T> where T: 'a + Ord {
     heads: VecDeque<Node<'a, T>>,
+    // Captive arena that feeds us new nodes when we need them.
     allocator: &'a mut TypedArena<NodeData<'a, T>>,
+    // Unused node list to keep from leaking allocator memory. These nodes
+    // should have a None value and empty node list.
     free_nodes: Vec<Node<'a, T>>,
 }
 
 #[derive(Debug)]
 pub struct NodeData<'a, T> where T: 'a + Ord {
     rank: u16,
+    // This is an Option<T> instead of a T because we need a value to represent
+    // uninitialized NodeData instances that are kept in the free node list of a
+    // BinomialHeap.
     value: Option<T>,
     nodes: VecDeque<Node<'a, T>>,
 }
@@ -177,7 +183,7 @@ mod mytest {
         t.push(23i32);
         assert_eq![t.len(), 1];
         assert![!t.is_empty()];
-        // assert_eq![t.peek(), Some(&23i32)];
+        assert_eq![t.peek(), Some(&23i32)];
         assert_eq![t.pop(), Some(23i32)];
     }
 
