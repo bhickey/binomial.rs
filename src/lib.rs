@@ -3,6 +3,7 @@
 extern crate rand;
 extern crate test;
 
+use std::cmp;
 use std::cmp::Ordering;
 use std::collections::VecDeque;
 
@@ -32,7 +33,7 @@ fn combine<T:Ord>(mut h1: Node<T>, h2: Node<T>) -> Node<T> {
 
 // Destructively merges `a` and `b` into a new `VecDeque`.
 fn merge_nodes<T:Ord>(a: &mut VecDeque<Node<T>>, b: &mut VecDeque<Node<T>>) -> VecDeque<Node<T>> {
-    let mut result = VecDeque::new();
+    let mut result = VecDeque::with_capacity(cmp::max(a.len(), b.len()) + 1);
     while !a.is_empty() && !b.is_empty() {
         let a_rank = a[0].rank;
         let b_rank = b[0].rank;
@@ -50,10 +51,10 @@ fn merge_nodes<T:Ord>(a: &mut VecDeque<Node<T>>, b: &mut VecDeque<Node<T>>) -> V
             }
         }
     }
-    while (!a.is_empty()) {
+    while !a.is_empty() {
         result.push_back(a.pop_front().unwrap());
     }
-    while (!b.is_empty()) {
+    while !b.is_empty() {
         result.push_back(b.pop_front().unwrap());
     }
     return result;
@@ -65,7 +66,7 @@ impl <T:Ord> BinomialHeap<T> {
     }
 
     pub fn push(&mut self, value: T) {
-        let mut v = VecDeque::new();
+        let mut v = VecDeque::with_capacity(1);
         v.push_back(Box::new(NodeData {
             rank: 0,
             value: value,
