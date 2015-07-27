@@ -33,83 +33,30 @@ fn combine<T:Ord>(mut h1: Node<T>, h2: Node<T>) -> Node<T> {
 // Destructively merges `a` and `b` into a new `VecDeque`.
 fn merge_nodes<T:Ord>(a: &mut VecDeque<Node<T>>, b: &mut VecDeque<Node<T>>) -> VecDeque<Node<T>> {
     let mut result = VecDeque::new();
-    loop {
-        match (a.pop_back(), b.pop_back()) {
-            (None, None) => return result,
-            (Some(h1), None) => result.push_back(h1),
-            (None, Some(h2)) => result.push_back(h2),
-            (Some(h1), Some(h2)) =>
-                match h1.rank.cmp(&h2.rank) {
-                    Ordering::Equal => {
-                        let merged = combine(h1, h2);
-                        let r = merged.rank;
-                        if r != a.back().map(|n| n.rank).unwrap_or(0) {
-                            if r != b.back().map(|n| n.rank).unwrap_or(0) {
-                                let mut recur = merge_nodes(a, b);
-                                loop {
-                                    match recur.pop_back() {
-                                        None => break,
-                                        Some(x) => result.push_back(x),
-                                    }
-                                }
-                                result.push_back(merged);
-                            } else {
-                                a.push_back(merged);
-                                let mut recur = merge_nodes(a, b);
-                                loop {
-                                    match recur.pop_back() {
-                                        None => break,
-                                        Some(x) => result.push_back(x),
-                                    }
-                                }
-                            }
-                        } else {
-                            if r != b.back().map(|n| n.rank).unwrap_or(0) {
-                                b.push_back(merged);
-                                let mut recur = merge_nodes(a, b);
-                                loop {
-                                    match recur.pop_back() {
-                                        None => break,
-                                        Some(x) => result.push_back(x),
-                                    }
-                                }
-                            } else {
-                                let mut recur = merge_nodes(a, b);
-                                loop {
-                                    match recur.pop_back() {
-                                        None => break,
-                                        Some(x) => result.push_back(x),
-                                    }
-                                }
-                                result.push_back(merged);
-                            }
-                        }
-                    },
-                    Ordering::Less => {
-                        b.push_back(h2);
-                        let mut recur = merge_nodes(a, b);
-                        loop {
-                            match recur.pop_back() {
-                                None => break,
-                                Some(x) => result.push_back(x),
-                            }
-                        }
-                        result.push_back(h1);
-                    },
-                    Ordering::Greater => {
-                        a.push_back(h1);
-                        let mut recur = merge_nodes(b, a);
-                        loop {
-                            match recur.pop_back() {
-                                None => break,
-                                Some(x) => result.push_back(x),
-                            }
-                        }
-                        result.push_back(h2);
-                    },
-                },
+    while !a.is_empty() && !b.is_empty() {
+        let a_rank = a[0].rank;
+        let b_rank = b[0].rank;
+        match a_rank.cmp(&b_rank) {
+            Ordering::Less => result.push_back(a.pop_front().unwrap()),
+            Ordering::Greater => result.push_back(b.pop_front().unwrap()),
+            Ordering::Equal => {
+                let a_node = a.pop_front().unwrap();
+                let b_node = b.pop_front().unwrap();
+                if a_node.value < b_node.value {
+                    result.push_back(combine(a_node, b_node))
+                } else {
+                    result.push_back(combine(b_node, a_node))
+                }
+            }
         }
     }
+    while (!a.is_empty()) {
+        result.push_back(a.pop_front().unwrap());
+    }
+    while (!b.is_empty()) {
+        result.push_back(b.pop_front().unwrap());
+    }
+    return result;
 }
 
 impl <T:Ord> BinomialHeap<T> {
