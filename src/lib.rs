@@ -146,15 +146,15 @@ mod mytest {
         assert_eq![t.pop(), Some(23i32)];
     }
 
-    fn get_values() -> Vec<i32> {
+    fn get_values(size: usize) -> Vec<i32> {
         let seed: &[_] = &[1, 2, 3, 4];
         let mut rng: StdRng = SeedableRng::from_seed(seed);
-        (0..100).map(|_| rng.gen::<i32>()).collect()
+        (0..size).map(|_| rng.gen::<i32>()).collect()
     }
 
-    #[bench]
-    fn bench_binomial(b: &mut Bencher) {
-        let values = get_values();
+    #[inline]
+    fn bench_binomial(b: &mut Bencher, size: usize) {
+        let values = get_values(size);
         let sorted = {
             let mut v = values.clone();
             v.sort_by(|x, y| y.cmp(x));
@@ -178,9 +178,36 @@ mod mytest {
         });
     }
 
+#[bench]
+    fn bench_binomial_tiny(b: &mut Bencher) {
+        bench_binomial(b, 10);
+    }
+
     #[bench]
-    fn bench_builtin(b: &mut Bencher) {
-        let values = get_values();
+    fn bench_binomial_small(b: &mut Bencher) {
+        bench_binomial(b, 100);
+    }
+
+    #[bench]
+    fn bench_binomial_medium(b: &mut Bencher) {
+        bench_binomial(b, 10000);
+    }
+
+    // large and ludicrous tests commented out for now.
+
+    // #[bench]
+    // fn bench_binomial_large(b: &mut Bencher) {
+    //     bench_binomial(b, 1000000);
+    // }
+
+    // #[bench]
+    // fn bench_binomial_ludicrous(b: &mut Bencher) {
+    //     bench_binomial(b, 10000000000);
+    // }
+
+    #[inline]
+    fn bench_builtin(b: &mut Bencher, size: usize) {
+        let values = get_values(size);
         let sorted = {
             let mut v = values.clone();
             v.sort_by(|x, y| y.cmp(x));
@@ -202,4 +229,31 @@ mod mytest {
             assert_eq![heap_sorted, sorted];
         });
     }
+
+    #[bench]
+    fn bench_builtin_tiny(b: &mut Bencher) {
+        bench_builtin(b, 10);
+    }
+
+    #[bench]
+    fn bench_builtin_small(b: &mut Bencher) {
+        bench_builtin(b, 100);
+    }
+
+    #[bench]
+    fn bench_builtin_medium(b: &mut Bencher) {
+        bench_builtin(b, 10000);
+    }
+
+    // large and ludicrous tests commented out for now.
+
+    // #[bench]
+    // fn bench_builtin_large(b: &mut Bencher) {
+    //     bench_builtin(b, 1000000);
+    // }
+
+    // #[bench]
+    // fn bench_builtin_ludicrous(b: &mut Bencher) {
+    //     bench_builtin(b, 10000000000);
+    // }
 }
