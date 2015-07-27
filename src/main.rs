@@ -3,7 +3,7 @@ extern crate binomial;
 use binomial::BinomialHeap;
 use std::env;
 
-fn main() {
+pub fn main() {
     // Run like: ./binomial 6 5 4 3 2 1.
     let mut heap = BinomialHeap::new();
     for s in env::args().skip(1) {
