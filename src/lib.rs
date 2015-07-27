@@ -5,52 +5,22 @@ extern crate test;
 
 use std::cmp::Ordering;
 use std::collections::VecDeque;
-use std::fmt;
-use std::result::Result;
 
 #[derive(Debug)]
-pub struct BinomialHeap {
-    heads: VecDeque<Node>,
-}
-
-fn format_node_list(nodes: &VecDeque<Node>, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
-    try![write![f, "["]];
-    let mut i = nodes.iter();
-    if let Some(n) = i.next() {
-        try![write![f, "[{}", n.value]];
-        if !n.nodes.is_empty() {
-            try![write![f, " "]];
-            try![format_node_list(&n.nodes, f)];
-        }
-        try![write![f, "]"]];
-    }
-    for n in i {
-        try![write![f, ", [{}", n.value]];
-        if !n.nodes.is_empty() {
-            try![write![f, " "]];
-            try![format_node_list(&n.nodes, f)];
-        }
-        try![write![f, "]"]];
-    }
-    write![f, "]"]
-}
-
-impl fmt::Display for BinomialHeap {
-    fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
-        format_node_list(&self.heads, f)
-    }
+pub struct BinomialHeap<T:Ord> {
+    heads: VecDeque<Node<T>>,
 }
 
 #[derive(Debug)]
-struct NodeData {
+struct NodeData<T:Ord> {
     rank: u16,
-    value: i32,
-    nodes: VecDeque<Node>,
+    value: T,
+    nodes: VecDeque<Node<T>>,
 }
 
-type Node = Box<NodeData>;
+type Node<T> = Box<NodeData<T>>;
 
-fn combine(mut h1: Node, h2: Node) -> Node {
+fn combine<T:Ord>(mut h1: Node<T>, h2: Node<T>) -> Node<T> {
     if h1.value >= h2.value {
         h1.rank += 1;
         h1.nodes.push_back(h2);
@@ -61,7 +31,7 @@ fn combine(mut h1: Node, h2: Node) -> Node {
 }
 
 // Destructively merges `a` and `b` into a new `VecDeque`.
-fn merge_nodes(a: &mut VecDeque<Node>, b: &mut VecDeque<Node>) -> VecDeque<Node> {
+fn merge_nodes<T:Ord>(a: &mut VecDeque<Node<T>>, b: &mut VecDeque<Node<T>>) -> VecDeque<Node<T>> {
     let mut result = VecDeque::new();
     loop {
         match (a.pop_back(), b.pop_back()) {
@@ -142,12 +112,12 @@ fn merge_nodes(a: &mut VecDeque<Node>, b: &mut VecDeque<Node>) -> VecDeque<Node>
     }
 }
 
-impl BinomialHeap {
+impl <T:Ord> BinomialHeap<T> {
     pub fn new() -> Self {
         BinomialHeap { heads: VecDeque::new() }
     }
 
-    pub fn push(&mut self, value: i32) {
+    pub fn push(&mut self, value: T) {
         let mut v = VecDeque::new();
         v.push_back(Box::new(NodeData {
             rank: 0,
@@ -159,7 +129,7 @@ impl BinomialHeap {
             &mut v);
     }
 
-    pub fn pop(&mut self) -> Option<i32> {
+    pub fn pop(&mut self) -> Option<T> {
         if self.heads.is_empty() {
             return None
         }
@@ -179,8 +149,8 @@ impl BinomialHeap {
         return Some(value)
     }
 
-    pub fn peek(&self) -> Option<i32> {
-        self.heads.iter().map(|n| n.value).max()
+    pub fn peek(&self) -> Option<&T> {
+        self.heads.iter().map(|n| &n.value).max()
     }
 
     pub fn is_empty(&self) -> bool {
@@ -198,8 +168,8 @@ impl BinomialHeap {
         return sz
     }
 
-    pub fn merge(&mut self, mut other: BinomialHeap) {
-        self.heads = merge_nodes(&mut self.heads, &mut other.heads);
+    pub fn merge(&mut self, mut other: BinomialHeap<T>) {
+      self.heads = merge_nodes(&mut self.heads, &mut other.heads);
     }
 }
 
@@ -213,7 +183,7 @@ mod mytest {
 
     #[test]
     fn instantiate_empty_heap() {
-        BinomialHeap::new();
+        BinomialHeap::<usize>::new();
     }
 
     #[test]
@@ -224,7 +194,7 @@ mod mytest {
         t.push(23i32);
         assert_eq![t.len(), 1];
         assert![!t.is_empty()];
-        assert_eq![t.peek(), Some(23i32)];
+        assert_eq![t.peek(), Some(&23i32)];
         assert_eq![t.pop(), Some(23i32)];
     }
 
